@@ -1,0 +1,4 @@
+interface:
+  display_name: "微信公众号内容搜索"
+  short_description: "搜索并核验微信公众号文章，整理原文链接、时间与摘要"
+  default_prompt: "Use $search-wechat-articles to search WeChat Official Account articles about a topic and return verified source links."
