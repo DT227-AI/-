@@ -2,6 +2,21 @@
 
 Replace placeholders and run multiple complementary queries.
 
+## Default priority accounts
+
+Run this mandatory five-query pass before broad discovery. Each query includes both aliases:
+
+```text
+site:mp.weixin.qq.com ("投资界" OR "pedaily2012") "<topic>"
+site:mp.weixin.qq.com ("36氪" OR "wow36kr") "<topic>"
+site:mp.weixin.qq.com ("投中网" OR "China-Venture") "<topic>"
+site:mp.weixin.qq.com ("融中财经" OR "thecapital") "<topic>"
+site:mp.weixin.qq.com ("创投日报" OR "VentureCapitalDaily") "<topic>"
+```
+
+If the user explicitly names another account, search that account before this default list.
+Do not mark a priority account as searched unless its dedicated query was executed.
+
 ## General topic
 
 ```text
@@ -59,9 +74,10 @@ For deduplication:
 
 Rank each candidate using this order:
 
-1. verified account-name match;
-2. title exact-phrase match;
-3. verified date-range match;
-4. direct canonical WeChat URL;
-5. body text available for verification;
-6. snippet-only or inaccessible result.
+1. verified match to an account explicitly requested by the user;
+2. title exact-phrase and topical relevance;
+3. verified match to a default priority account;
+4. verified date-range match;
+5. direct canonical WeChat URL;
+6. body text available for verification;
+7. snippet-only or inaccessible result.
