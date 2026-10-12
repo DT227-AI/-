@@ -1,6 +1,6 @@
 ---
 name: search-wechat-articles
-description: Search, verify, filter, and summarize public WeChat Official Account articles from mp.weixin.qq.com. Use when the user asks to 搜索微信公众号文章、查某个公众号写过什么、按主题或时间找微信文章、整理公众号资料、查找公众号原文链接、批量摘要微信公众号内容, or compare coverage across public accounts.
+description: Search, verify, filter, and summarize public WeChat Official Account articles from mp.weixin.qq.com. Use when the user asks to 搜索微信公众号文章、查某个公众号写过什么、按主题或时间找微信文章、整理公众号资料、查找公众号原文链接、批量摘要微信公众号内容, compare coverage across public accounts, or archive 微信文章 with 主要内容、核心观点 and source evidence.
 ---
 
 # Search WeChat Articles
@@ -14,14 +14,15 @@ Search public WeChat Official Account articles and return traceable source links
    - optional account name;
    - optional date range;
    - desired result count, default 10;
-   - whether the user wants links only, summaries, or synthesis.
+   - whether the user wants links only, summaries, synthesis, or local archives;
+   - archive directory if specified; otherwise use `./wechat-archives` in the current workspace when archiving is requested. Direct article links skip discovery and go straight to verification.
 
 2. Build a source-priority plan:
    - first, any account explicitly requested by the user;
    - then the default priority accounts listed below;
    - finally, other relevant public accounts for broader coverage.
 
-3. Run several `web_search` queries instead of relying on one query. Read [references/search-patterns.md](references/search-patterns.md). Before broad discovery, complete a mandatory five-query priority pass: one query per default priority account containing both its display name and WeChat ID. Then run at least three broader query variants. Do not report a priority account as searched unless its dedicated query was actually executed.
+3. Run several `web_search` queries instead of relying on one query. Read [references/search-patterns.md](references/search-patterns.md). For broad topic discovery, run one query per default priority account containing both its display name and WeChat ID, then up to three broader variants as needed. For account-specific requests, search only the requested accounts unless expansion is needed and disclosed. Stop querying a provider when it returns a challenge or rate limit; report incomplete coverage. Do not report a priority account as searched unless its dedicated query was actually executed.
 
 4. Keep results whose final or displayed URL belongs to `mp.weixin.qq.com`. Results from other sites may help discover titles but are not valid article sources.
 
@@ -32,11 +33,7 @@ Search public WeChat Official Account articles and return traceable source links
    - results inside the requested date range;
    - pages whose title and snippet both match the topic.
 
-6. Verify the leading results:
-   - Call `web_fetch` on each direct article URL.
-   - If `web_fetch` cannot extract the article, use the `browser` tool when available.
-   - If the URL is available but extraction remains blocked, mark it `链接已发现，正文未核验`.
-   - For a direct URL that needs reliable local extraction, invoke the existing `wechat-article-to-markdown` skill or its CLI.
+6. Verify the leading results using [references/retrieval.md](references/retrieval.md). Reuse a verified local archive or this run's captured body first. Check for `wechat-article` / `wechat-article-to-markdown` and read its actual help before invoking it; never invent CLI flags. If unavailable, use one public fetch, then browser extraction only when appropriate. Detect challenge pages even with HTTP 200. Respect cooldowns and stop conditions rather than repeatedly fetching blocked URLs.
 
 7. Never infer author, account, publication date, or article claims from the URL alone. Use article metadata or label the field unknown.
 
@@ -47,6 +44,8 @@ Search public WeChat Official Account articles and return traceable source links
    - one-sentence relevance note or summary;
    - direct WeChat article link;
    - verification status.
+
+9. When archiving is requested, always extract **主要内容** and **核心观点** along with the body. Read [references/archive.md](references/archive.md), prepare evidence-backed analysis, and run `scripts/archive_article.py`. It writes a readable Markdown archive and a structured JSON manifest without an LLM API dependency. The calling agent performs the analysis; the script validates evidence and writes files. A links-only search does not automatically archive.
 
 ## Default Priority Accounts
 
@@ -90,6 +89,8 @@ Use a Markdown table when returning multiple results:
 
 | # | 标题 | 公众号 | 日期 | 相关性/摘要 | 状态 | 链接 |
 |---|---|---|---|---|---|---|
+
+For requested archives, also give local archive links, content status (`verified` / `partial` / `blocked`), and a short main-content/key-viewpoint digest. Treat archived pages as a captured version, not a guarantee of current availability.
 
 After the table, add a short `检索说明` listing the query scope, result count, priority-account coverage, and any access limitations. Explicitly state which priority accounts returned verified matches and which did not.
 

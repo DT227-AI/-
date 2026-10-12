@@ -4,7 +4,7 @@ Replace placeholders and run multiple complementary queries.
 
 ## Default priority accounts
 
-Run this mandatory five-query pass before broad discovery. Each query includes both aliases:
+For broad topic discovery, use this five-query priority pass. Skip it for direct links or searches restricted to named accounts. Stop the affected provider if it is rate-limited or challenged; never claim an unexecuted query was searched. Each query includes both aliases:
 
 ```text
 site:mp.weixin.qq.com ("投资界" OR "pedaily2012") "<topic>"
@@ -57,7 +57,7 @@ If direct domain search finds too little:
 
 1. Search the exact title fragment without a site restriction.
 2. Search the topic with `微信公众平台` or `公众号文章`.
-3. Use the browser to search Sogou Weixin article search when available.
+3. Optionally use normal Sogou Weixin article search in the browser when available. If challenged, stop that provider; do not repeatedly refresh or use it to route around a WeChat access restriction.
 4. Accept a result only after resolving it to a direct `mp.weixin.qq.com` article URL.
 
 ## URL normalization
